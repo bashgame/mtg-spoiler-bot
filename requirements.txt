@@ -1,4 +1,6 @@
 # Dependencies for this project
+aiohttp
+discord
 
 # testing/linting dependencies
 nose
