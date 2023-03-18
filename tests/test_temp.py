@@ -1,15 +1,17 @@
 """
 Template Test Cases, please update
 """
+import aiohttp
 from unittest import TestCase
-from modules import *
+from modules import mtgSpoilers
 
-class TestTemplate(TestCase):
-    """ Test Template, please update """
+class TestSpoilers(TestCase):
+    """ Tests for methods to scrape mtg-spoilers """
 
     @classmethod
     def setUpClass(cls):
-        """ Do something to set up tests, please update """
+        """ Setup some variables """
+        cls.expected_sets = {'ltc','ltr','cmm','mat','mul','moc','mom','sis','sir'}
 
     @classmethod
     def tearDownClass(cls):
@@ -25,6 +27,11 @@ class TestTemplate(TestCase):
     #   T E S T  C A S E S
     ###########################################################################
 
-    def test_template(self):
-        """ Template test case, please update """
-        self.assertTrue(True)
+    def test_get_sets(self):
+        """ It should return a dictionary of sets that aren't released yet """
+        session = aiohttp.ClientSession()
+        set_codes = set()
+        result = mtgSpoilers.get_latest_sets(session)
+        set_codes |= {result.keys()}
+        self.assertEqual(self.expected_sets, set_codes)
+        
