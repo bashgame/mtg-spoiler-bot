@@ -1,0 +1,8 @@
+# Dependencies for this project
+
+# testing/linting dependencies
+nose
+pinocchio
+coverage
+pylint
+flake8
