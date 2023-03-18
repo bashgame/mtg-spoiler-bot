@@ -1,35 +1,46 @@
-import os
+# import os
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands  # , tasks
 import aiohttp
 import asyncio
+
 
 TOKEN = 'YOUR_BOT_TOKEN'
 CHANNEL_ID = 123456789012345678  # Replace with your desired channel ID
 
 bot = commands.Bot(command_prefix='!')
 
+
 async def get_latest_sets(session):
     async with session.get('https://api.scryfall.com/sets') as response:
         if response.status == 200:
             data = await response.json()
-            return {set_data['code']: set_data['name'] for set_data in data['data'] if set_data['set_type'] in ['expansion', 'core']}
+            return {set_data['code']: set_data['name'] for set_data in data['data']
+                    if set_data['set_type'] in ['expansion', 'core']}
         return {}
 
+
 async def get_new_spoilers(session, set_code):
-    async with session.get(f'https://api.scryfall.com/cards/search?order=spoiled&q=e%3A{set_code}+is%3Aspoiler') as response:
+    async with session.get(
+            f'https://api.scryfall.com/cards/search?order=spoiled&q=e%3A{set_code}+is%3Aspoiler'
+            ) as response:
         if response.status == 200:
             data = await response.json()
             return data['data']
         return []
 
+
 async def post_spoilers(spoilers):
     channel = bot.get_channel(CHANNEL_ID)
     for spoiler in spoilers:
-        embed = discord.Embed(title=spoiler['name'], url=spoiler['scryfall_uri'], description=spoiler['oracle_text'], color=0x3498db)
+        embed = discord.Embed(
+            title=spoiler['name'], url=spoiler['scryfall_uri'],
+            description=spoiler['oracle_text'], color=0x3498db
+        )
         embed.set_image(url=spoiler['image_uris']['normal'])
         embed.set_footer(text=spoiler['set_name'])
         await channel.send(embed=embed)
+
 
 @bot.event
 async def on_ready():
@@ -37,7 +48,7 @@ async def on_ready():
 
     tracked_sets = {}
     already_spoiled = set()
-    
+
     async with aiohttp.ClientSession() as session:
         while True:
             # Update the tracked sets
